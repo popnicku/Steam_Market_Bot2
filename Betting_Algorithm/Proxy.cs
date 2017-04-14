@@ -146,7 +146,10 @@ namespace Betting_Algorithm
             }
         }
 
+        private void GitTestFunction()
+        {
 
+        }
 
     }
 }
