@@ -75,6 +75,7 @@ namespace Betting_Algorithm
                         }
                         catch (Exception e)
                         {
+                            //implement proxy remove?
                             Console.WriteLine("Exception in task" + e);
                         }
                     });
@@ -127,6 +128,7 @@ namespace Betting_Algorithm
 
         public WebProxy GetNextProxy()
         {
+            //THIS IS BUGGY, ENTERS IF EVEN IF FALSE WTF???
             if (proxyList.Count > 0)
             {
                 try
