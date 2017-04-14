@@ -12,7 +12,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Collections.Specialized;
 using System.IO;
-
+// git ok???
 namespace Betting_Algorithm
 {
     public class Parser
