@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
 using System.Threading;
 using System.Net;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
-using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Collections.Specialized;
 using System.IO;
-// git ok???
+
 namespace Betting_Algorithm
 {
     public class Parser
