@@ -52,11 +52,14 @@ namespace Betting_Algorithm
             Console.WriteLine("Geting proxies from list");
             StreamReader file = new StreamReader("../../proxy_list.txt");
             string line;
-            
+            string downTestString;
+
             //string parsedLine;
             List<string> proxyLines = new List<string>();
             while ((line = file.ReadLine()) != null)
+            {
                 proxyLines.Add(line);
+            }
             Parallel.For(0, proxyLines.Count, index =>
             {
                 try
@@ -68,13 +71,13 @@ namespace Betting_Algorithm
                     {
                         Proxy = new WebProxy(currentProxy)
                     };
-                    string x = null;
+                    downTestString = null;
 
                     Task proxTask = Task.Run(() =>
                     {
                         try
                         {
-                            x = webProxyClient.DownloadString("http://steamcommunity.com/");
+                            downTestString = webProxyClient.DownloadString("http://steamcommunity.com/");
                         }
                         catch (Exception e)
                         {
@@ -83,14 +86,16 @@ namespace Betting_Algorithm
                     });
                     if (proxTask.Wait(TimeSpan.FromSeconds(2))) 
                     {
-                        if (x != null)
+                        if (downTestString != null)
                         {
                             Console.WriteLine("Proxy " + currentProxy + " ok");
                             MainWindow.main.UpdatePricesFromProxy(currentProxy);
                             numberOfWorkingProxies++;
                             proxyList.Add(new WebProxy(currentProxy));
                             if (numberOfWorkingProxies >= 5)
+                            {
                                 MainWindow.main.WEBParser.InitThreads();
+                            }
                         }
                         else
                         {
@@ -110,7 +115,14 @@ namespace Betting_Algorithm
             });
             Console.WriteLine("Proxies from list retrieved, total of " + proxyList.Count);
             MainWindow.main.UpdatePricesFromProxy("Total number of proxies:  " + proxyList.Count);
-            MainWindow.main.Dispatcher.BeginInvoke(new Action(() => { MainWindow.main.ParseButton.IsEnabled = true; }));
+            MainWindow.main.Dispatcher.BeginInvoke
+                (
+                    new Action(() 
+                    => 
+                        {
+                            MainWindow.main.ParseButton.IsEnabled = true;
+                        }
+                ));
         }
 
 

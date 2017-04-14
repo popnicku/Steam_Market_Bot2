@@ -34,7 +34,6 @@ namespace Betting_Algorithm
         public struct DataStructure
         {
             
-            
             public float[] lowestPrice;
             public float[] mediumPrice;
             public WebClient[] WebClient;
@@ -55,8 +54,8 @@ namespace Betting_Algorithm
         {
             InitializeStructure();
             IP_Proxy = new Proxy();
-            //InitThreads();
-
+            ComputeNamesAndURL();
+        //InitThreads();
         }
 
         private void AddUrlsToStructure()
@@ -112,9 +111,21 @@ namespace Betting_Algorithm
 
         public void InitThreads()
         {
+
+            for(int index = 0; index < numberOfElements; index++)
+            {
+
+                //ComputeNamesAndURL();
+                WebData_Structure.mediumPrice[index] = -1;                
+                CreateThread(index);
+            }
+        }
+
+        private void ComputeNamesAndURL()
+        {
             string nameFromUrl = null;
             string lastPartOfURL = null;
-            for(int index = 0; index < numberOfElements; index++)
+            for (int index = 0; index < numberOfElements; index++)
             {
                 lastPartOfURL = (WebData_Structure.URL_List[index].Split('=')[3]);
                 nameFromUrl = lastPartOfURL.Replace("%20", " ");
@@ -123,15 +134,16 @@ namespace Betting_Algorithm
                 nameFromUrl = nameFromUrl.Replace("%28", "(");
                 nameFromUrl = nameFromUrl.Replace("%29", ")");
                 nameFromUrl = nameFromUrl.Replace("%A2", " ");
+                nameFromUrl = nameFromUrl.Replace("%27", "'");
+                nameFromUrl = nameFromUrl.Replace("%E2%98%85", "★");
+                nameFromUrl = nameFromUrl.Replace("E9%BE%8D%E7%8E%8B", "龍王");
+                WebData_Structure.name[index] = nameFromUrl;
 
                 WebData_Structure.Item_Url[index] = "http://steamcommunity.com/market/listings/" + GetElementToGameID(index) + "/" + lastPartOfURL;
 
-                WebData_Structure.mediumPrice[index] = -1;
-
-                WebData_Structure.name[index] = nameFromUrl;
-                CreateThread(index);
-
+                PushDataToQueue("init@" +  WebData_Structure.name[index]);
             }
+            //PushDataToQueue("update@3@21.1");
         }
 
         private void CreateThread(int index)
@@ -156,12 +168,12 @@ namespace Betting_Algorithm
         void Start_Web_Th(int element_ID)
         {
             Console.WriteLine("Thread " + element_ID + " entered");
-            
 
+            WebProxy wp;
             string url = WebData_Structure.URL_List[element_ID];
             while (true)
             {
-                WebProxy wp = IP_Proxy.GetNextProxy();
+                 wp = IP_Proxy.GetNextProxy();
                 if (wp != null)
                 {
                     // WebData_Structure.WebClient[element_ID] = new WebClient();
@@ -178,12 +190,13 @@ namespace Betting_Algorithm
                             Thread.Sleep(20);
                         }
                         if (WebData_Structure.WebClient[element_ID].Proxy == null)
+                        {
                             continue;
+                        }
                         WebData_Structure.downloadString[element_ID] = WebData_Structure.WebClient[element_ID].DownloadString(url);
-
                         WebData_Structure.json[element_ID] = JObject.Parse(WebData_Structure.downloadString[element_ID]);
-
                         WebData_Structure.lowestPrice[element_ID] = (float)(decimal.Parse(WebData_Structure.json[element_ID]["lowest_price"].ToString().Replace("€", ""), System.Globalization.NumberStyles.Currency)) / 100;
+
                         if (WebData_Structure.mediumPrice[element_ID] == -1)
                         {
                             WebData_Structure.mediumPrice[element_ID] = (float)(decimal.Parse(WebData_Structure.json[element_ID]["median_price"].ToString().Replace("€", ""), System.Globalization.NumberStyles.Currency)) / 100;
@@ -193,10 +206,9 @@ namespace Betting_Algorithm
                             Process.Start(@"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", WebData_Structure.Item_Url[element_ID]);
                         }
                         Console.WriteLine("Lowest price for " + WebData_Structure.URL_List[element_ID] + " = " + WebData_Structure.lowestPrice[element_ID]);
-
-                        PushDataToQueue(WebData_Structure.name[element_ID] + " - " + WebData_Structure.lowestPrice[element_ID]);
-
-                        Thread.Sleep(1000);
+                       // PushDataToQueue(WebData_Structure.name[element_ID] + " @ " + WebData_Structure.lowestPrice[element_ID]);
+                        PushDataToQueue("update@" + element_ID + "@" + WebData_Structure.lowestPrice[element_ID]);
+                        //PushDataToQueue("update@3@21.1");
 
                     }
                     /*catch(WebException e)
@@ -212,6 +224,7 @@ namespace Betting_Algorithm
                         Console.WriteLine("Exception occured in [Start_Web_Th]:: " + e);
                     }
                 }
+                Thread.Sleep(1000);
             }
         }
 

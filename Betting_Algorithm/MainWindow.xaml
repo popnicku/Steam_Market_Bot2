@@ -11,7 +11,9 @@
             >
     <Grid>
         <Button x:Name="ParseButton" Content="Initialize Parse" IsEnabled="False" Click="ParseButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="136" Margin="55,43,0,0"/>
-        <TextBox x:Name="Prices" HorizontalAlignment="Left" Height="506" Margin="314,94,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="451"/>
+        <TextBox Visibility="Hidden" x:Name="Prices" HorizontalAlignment="Left" Height="506" Margin="314,94,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="451"/>
         <TextBox Text="" VerticalScrollBarVisibility="Visible" Name="TextBox_Proxy_List" HorizontalAlignment="Left" Margin="37,140,0,0" VerticalAlignment="Top" Width="181" Height="460"/>
+        <DataGrid x:Name="DataGrid_Prices" ItemsSource="{Binding _DataTable_Prices}" HorizontalAlignment="Left" Height="557" Margin="280,43,0,0" VerticalAlignment="Top" Width="516" AutoGenerateColumns="True">
+        </DataGrid>
     </Grid>
 </Controls:MetroWindow>

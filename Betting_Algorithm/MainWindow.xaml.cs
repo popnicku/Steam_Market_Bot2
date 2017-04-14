@@ -18,6 +18,8 @@ using MahApps.Metro.Controls;
 using System.Threading;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Data;
+using System.Collections.ObjectModel;
 
 namespace Betting_Algorithm
 {
@@ -31,7 +33,9 @@ namespace Betting_Algorithm
         //Proxy IP_Proxy;
         public static MainWindow main;
 
-       public ConcurrentQueue<string> UIQueue = new ConcurrentQueue<string>();
+        public ConcurrentQueue<string> UIQueue = new ConcurrentQueue<string>();
+
+        ObservableCollection<DataObject> _ObsCollection_List = new ObservableCollection<DataObject>();
 
         public MainWindow()
         {
@@ -39,8 +43,13 @@ namespace Betting_Algorithm
             WEBParser = new Parser();
             InitializeComponent();
 
+            //_ObsCollection_List.Add(new DataObject() { Name = "item 1", Price = 20.41f });
+
+            this.DataGrid_Prices.ItemsSource = _ObsCollection_List;
+
+
             //IP_Proxy = new Proxy();
-            
+
 
             Thread UIThread = new Thread(UpdateUI_Thread);
             UIThread.Start();
@@ -48,14 +57,53 @@ namespace Betting_Algorithm
 
         }
 
-        
+        //public void UpdateGrid
+
+        public void InitializeDataGrid(string ItemName, string ItemPrice)
+        {
+            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.DataBind, new Action(
+                ()
+                    =>_ObsCollection_List.Add(new DataObject()
+                    {
+                        Name = ItemName,
+                        Price = ItemPrice
+                    })
+                ));
+        }
+
+        public void UpdateDataGrid(int index, string ItemPrice)
+        {
+            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.DataBind, new Action(
+                () =>
+                    {
+                        _ObsCollection_List[index].Price = ItemPrice;
+                        //_ObsCollection_List[index] = (new DataObject() { Price = ItemPrice });
+                    }
+                ));
+        }
+
         public void UpdateUI_Thread()
         {
+            string[] parseString = null;
+            string command = null;
             while (true)
             {
-                if(UIQueue.Count > 0)
-                    if(UIQueue.TryDequeue(out string result))
-                        Dispatcher.BeginInvoke(new Action(() => { Prices.Text += result + "\n"; }));
+                if (UIQueue.Count > 0)
+                {
+                    if (UIQueue.TryDequeue(out string result))
+                    {
+                        parseString = result.Split('@');
+                        if (parseString[0] == "init") // check command
+                        {
+                            InitializeDataGrid(parseString[1], "N/A");
+                        }
+                        else if(parseString[0] == "update")
+                        {
+                            UpdateDataGrid(Int32.Parse(parseString[1]), parseString[2]);
+                        }
+                    }
+                }
+                        //Dispatcher.BeginInvoke(new Action(() => { Prices.Text += result + "\n"; }));
             }
         }
 
