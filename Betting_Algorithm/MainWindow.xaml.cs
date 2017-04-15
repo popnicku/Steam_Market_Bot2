@@ -47,11 +47,11 @@ namespace Betting_Algorithm
         {
             Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.DataBind, new Action(
                 ()
-                    =>_ObsCollection_List.Add(new DataObject()
+                    => _ObsCollection_List.Add(new DataObject()
                     {
                         Name = ItemName,
                         Price = ItemPrice,
-                        BuyOutPrice = "-1"
+                        MediamPrice = "-1"
                     })
                 ));
         }
@@ -62,7 +62,7 @@ namespace Betting_Algorithm
                 () =>
                     {
                         _ObsCollection_List[index].Price = ItemPrice;
-                        _ObsCollection_List[index].BuyOutPrice = BuyPrice;
+                        _ObsCollection_List[index].MediamPrice = BuyPrice;
                         //_ObsCollection_List[index] = (new DataObject() { Price = ItemPrice });
                     }
                 ));
@@ -83,19 +83,41 @@ namespace Betting_Algorithm
                         {
                             InitializeDataGrid(parseString[1], "N/A");
                         }
-                        else if(parseString[0] == "update")
+                        else if (parseString[0] == "update")
                         {
                             UpdateDataGrid(Int32.Parse(parseString[1]), parseString[2], parseString[3]);
                         }
                     }
                 }
-                        //Dispatcher.BeginInvoke(new Action(() => { Prices.Text += result + "\n"; }));
+                //Dispatcher.BeginInvoke(new Action(() => { Prices.Text += result + "\n"; }));
             }
         }
 
         public void UpdatePricesFromProxy(string text)
         {
-            Dispatcher.BeginInvoke(new Action(() => { TextBox_Proxy_List.Text += text + "\n"; }));
+            Dispatcher.BeginInvoke(
+                new Action(() => 
+                {
+                    TextBox_Proxy_List.Text += text + "\n";
+                }));
+        }
+
+        public void UpdateNoOfProxies(int nr)
+        {
+            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, 
+                new Action(()=> 
+                {
+                    Label_NoProxies.Content = "Proxies: " + nr;
+                }));
+        }
+
+        public void UpdateNoOfItems(int nr)
+        {
+            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                new Action(() =>
+                {
+                    Label_NoItems.Content = "Items: " + nr;
+                }));
         }
 
 

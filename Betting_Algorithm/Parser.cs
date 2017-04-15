@@ -63,6 +63,7 @@ namespace Betting_Algorithm
                 WebData_Structure.URL_List.Add(lineRead);
             }
             numberOfElements = WebData_Structure.URL_List.Count;
+            MainWindow.main.UpdateNoOfItems(numberOfElements);
             /*
                 WebData_Structure.URL_List[0] = "http://steamcommunity.com/market/priceoverview/?appid=570&currency=3&market_hash_name=Exalted%20Great%20Sage%27s%20Reckoning"; 
                 WebData_Structure.URL_List[1] = "http://steamcommunity.com/market/priceoverview/?appid=570&currency=3&market_hash_name=Battlefury";

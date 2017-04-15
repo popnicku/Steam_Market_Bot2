@@ -12,7 +12,7 @@
             get;
             set;
         }
-        public string BuyOutPrice
+        public string MediamPrice
         {
             get;
             set;

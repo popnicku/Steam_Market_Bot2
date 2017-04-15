@@ -15,5 +15,7 @@
         <TextBox Text="" VerticalScrollBarVisibility="Visible" Name="TextBox_Proxy_List" HorizontalAlignment="Left" Margin="37,140,0,0" VerticalAlignment="Top" Width="181" Height="460"/>
         <DataGrid x:Name="DataGrid_Prices" ItemsSource="{Binding _DataTable_Prices}" HorizontalAlignment="Left" Height="557" Margin="280,43,0,0" VerticalAlignment="Top" Width="516" AutoGenerateColumns="True">
         </DataGrid>
+        <Label Content="Proxies:" x:Name="Label_NoProxies" HorizontalAlignment="Left" Margin="823,43,0,0" VerticalAlignment="Top" Width="159" Height="29"/>
+        <Label Content="Items:" x:Name="Label_NoItems" HorizontalAlignment="Left" Margin="823,72,0,0" VerticalAlignment="Top" Width="159" Height="29"/>
     </Grid>
 </Controls:MetroWindow>

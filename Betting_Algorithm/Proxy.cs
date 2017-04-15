@@ -86,7 +86,8 @@ namespace Betting_Algorithm
                             Console.WriteLine("Proxy " + currentProxy + " ok");
                             MainWindow.main.UpdatePricesFromProxy(currentProxy);
                             numberOfWorkingProxies++;
-                            proxyList.Add(new WebProxy(currentProxy));
+                            //proxyList.Add(new WebProxy(currentProxy));
+                            AddProxy(new WebProxy(currentProxy));
                             if (numberOfWorkingProxies >= 5)
                             {
                                 MainWindow.main.WEBParser.InitThreads();
@@ -124,6 +125,13 @@ namespace Betting_Algorithm
         public void RemoveProxy(WebProxy proxyToRemove)
         {
             proxyList.Remove(proxyToRemove);
+            MainWindow.main.UpdateNoOfProxies(proxyList.Count);
+        }
+
+        private void AddProxy(WebProxy proxyToAdd)
+        {
+            proxyList.Add(proxyToAdd);
+            MainWindow.main.UpdateNoOfProxies(proxyList.Count);
         }
 
         public WebProxy GetNextProxy()
@@ -150,11 +158,15 @@ namespace Betting_Algorithm
 
         public WebProxy GetCurrentProxy()
         {
-            if(proxyList.Count > proxy_counter)
+            try
+            {
                 return proxyList[proxy_counter];
-            return null;
+            }
+            catch
+            {
+                return null;
+            }
+
         }
-
-
     }
 }
