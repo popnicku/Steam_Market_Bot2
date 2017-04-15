@@ -50,17 +50,19 @@ namespace Betting_Algorithm
                     =>_ObsCollection_List.Add(new DataObject()
                     {
                         Name = ItemName,
-                        Price = ItemPrice
+                        Price = ItemPrice,
+                        BuyOutPrice = "-1"
                     })
                 ));
         }
 
-        public void UpdateDataGrid(int index, string ItemPrice)
+        public void UpdateDataGrid(int index, string ItemPrice, string BuyPrice)
         {
             Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.DataBind, new Action(
                 () =>
                     {
                         _ObsCollection_List[index].Price = ItemPrice;
+                        _ObsCollection_List[index].BuyOutPrice = BuyPrice;
                         //_ObsCollection_List[index] = (new DataObject() { Price = ItemPrice });
                     }
                 ));
@@ -69,7 +71,7 @@ namespace Betting_Algorithm
         public void UpdateUI_Thread()
         {
             string[] parseString = null;
-            string command = null;
+            //string command = null;
             while (true)
             {
                 if (UIQueue.Count > 0)
@@ -83,7 +85,7 @@ namespace Betting_Algorithm
                         }
                         else if(parseString[0] == "update")
                         {
-                            UpdateDataGrid(Int32.Parse(parseString[1]), parseString[2]);
+                            UpdateDataGrid(Int32.Parse(parseString[1]), parseString[2], parseString[3]);
                         }
                     }
                 }

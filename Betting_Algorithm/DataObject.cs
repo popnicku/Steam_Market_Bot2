@@ -12,5 +12,10 @@
             get;
             set;
         }
+        public string BuyOutPrice
+        {
+            get;
+            set;
+        }
     }
 }

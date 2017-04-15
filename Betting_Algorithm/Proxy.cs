@@ -15,7 +15,7 @@ namespace Betting_Algorithm
         //private string IP_String = null;
         //private WebClient proxyWebClient;
         //private JObject json;
-        private List<WebProxy> proxyList = new List<WebProxy>();
+        public List<WebProxy> proxyList = new List<WebProxy>();
         private int proxy_counter = -1;
         //private int linesOfProxy = 0;
         public bool proxyBusy = true;
@@ -40,7 +40,7 @@ namespace Betting_Algorithm
             proxyList.Add(IP_String);
             return IP_String;
         }*/
-        Stopwatch sw = new Stopwatch();
+        //Stopwatch sw = new Stopwatch();
         private void GetProxyListFromFile()
         {
             Console.WriteLine("Geting proxies from list");
@@ -148,10 +148,13 @@ namespace Betting_Algorithm
             }
         }
 
-        private void GitTestFunction()
+        public WebProxy GetCurrentProxy()
         {
-
+            if(proxyList.Count > proxy_counter)
+                return proxyList[proxy_counter];
+            return null;
         }
+
 
     }
 }
