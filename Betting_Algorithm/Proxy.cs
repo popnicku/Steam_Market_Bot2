@@ -44,7 +44,7 @@ namespace Betting_Algorithm
         private void GetProxyListFromFile()
         {
             Console.WriteLine("Geting proxies from list");
-            StreamReader file = new StreamReader("../../proxy_list.txt");
+            StreamReader file = new StreamReader("../../Res/proxy_list.txt");
             string line;
             string downTestString;
 
@@ -124,8 +124,11 @@ namespace Betting_Algorithm
 
         public void RemoveProxy(WebProxy proxyToRemove)
         {
-            proxyList.Remove(proxyToRemove);
-            MainWindow.main.UpdateNoOfProxies(proxyList.Count);
+            if (proxyList.Contains(proxyToRemove))
+            {
+                proxyList.Remove(proxyToRemove);
+                MainWindow.main.UpdateNoOfProxies(proxyList.Count);
+            }
         }
 
         private void AddProxy(WebProxy proxyToAdd)

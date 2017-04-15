@@ -56,7 +56,7 @@ namespace Betting_Algorithm
         private void AddUrlsToStructure()
         {
             WebData_Structure.URL_List = new List<string>();
-            StreamReader fileReader = new StreamReader("../../items_list.txt");
+            StreamReader fileReader = new StreamReader("../../Res/items_list.txt");
             string lineRead;
             while ((lineRead = fileReader.ReadLine()) != null)
             {
@@ -89,7 +89,7 @@ namespace Betting_Algorithm
 
         private void InitializeStructure()
         {
-            numberOfElements = GetNumberOfLinesInFile("../../items_list.txt");
+            numberOfElements = GetNumberOfLinesInFile("../../Res/items_list.txt");
             WebData_Structure = new DataStructure
             {
                 WebClient = new WebClient[numberOfElements],
@@ -174,103 +174,101 @@ namespace Betting_Algorithm
             string url = WebData_Structure.URL_List[element_ID];
             while (true)
             {
-                if (element_ID % 4 == 0)
+                if (IP_Proxy.proxyList.Count > 5)
                 {
-                    wp = IP_Proxy.GetNextProxy();
-                }
-                else
-                {
-                    wp = IP_Proxy.GetCurrentProxy();
-                }
-                if (wp != null)
-                {
-                    // WebData_Structure.WebClient[element_ID] = new WebClient();
-                    WebData_Structure.WebClient[element_ID].Proxy = wp;
-                    try
+                    if (element_ID % 4 == 0)
                     {
                         Console.WriteLine("Changing proxy...");
-                        //WebData_Structure.WebClient[element_ID].Dispose();
-
+                        wp = IP_Proxy.GetNextProxy();
                         Console.WriteLine("Proxy changed to " + wp.Address);
+                    }
+                    else
+                    {
+                        wp = IP_Proxy.GetCurrentProxy();
+                    }
+                    if (wp != null)
+                    {
+                        // WebData_Structure.WebClient[element_ID] = new WebClient();
+                        WebData_Structure.WebClient[element_ID].Proxy = wp;
+                        try
+                        {
 
-                        while (WebData_Structure.WebClient[element_ID].IsBusy)
-                        {
-                            Thread.Sleep(20);
-                        }
-                        if (WebData_Structure.WebClient[element_ID].Proxy == null)
-                        {
-                            //continue;
-                            goto endOfCodeLabel;
-                        }
-                        Task downloadTask = Task.Run(() =>
-                        {
-                            try
+                            while (WebData_Structure.WebClient[element_ID].IsBusy)
                             {
-                                WebData_Structure.downloadString[element_ID] = WebData_Structure.WebClient[element_ID].DownloadString(url);
+                                Thread.Sleep(20);
                             }
-                            catch
+                            if (WebData_Structure.WebClient[element_ID].Proxy == null)
                             {
-                                IP_Proxy.RemoveProxy(wp);
+                                //continue;
+                                goto endOfCodeLabel;
                             }
-                        });
-                        if (downloadTask.Wait(TimeSpan.FromSeconds(3)))
-                        {
-
-                            WebData_Structure.json[element_ID] = JObject.Parse(WebData_Structure.downloadString[element_ID]);
-                            WebData_Structure.lowestPrice[element_ID] = (float)(decimal.Parse(WebData_Structure.json[element_ID]["lowest_price"].ToString().Replace("€", ""), System.Globalization.NumberStyles.Currency)) / 100;
-
-                            if (WebData_Structure.mediumPrice[element_ID] == -1)
+                            Task downloadTask = Task.Run(() =>
                             {
                                 try
                                 {
-                                    WebData_Structure.mediumPrice[element_ID] = (float)(decimal.Parse(WebData_Structure.json[element_ID]["median_price"].ToString().Replace("€", ""), System.Globalization.NumberStyles.Currency)) / 100;
+                                    WebData_Structure.downloadString[element_ID] = WebData_Structure.WebClient[element_ID].DownloadString(url);
                                 }
                                 catch
                                 {
-                                    WebData_Structure.mediumPrice[element_ID] = 5;
-                                }
+                                //IP_Proxy.RemoveProxy(wp);
                             }
-                            else if ((WebData_Structure.lowestPrice[element_ID] < (WebData_Structure.mediumPrice[element_ID]) / 2 && WebData_Structure.lowestPrice[element_ID] < 20) || (WebData_Structure.mediumPrice[element_ID] == -1 && WebData_Structure.lowestPrice[element_ID] <= 5))
+                            });
+                            if (downloadTask.Wait(TimeSpan.FromSeconds(3)))
                             {
-                                Process.Start(@"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", WebData_Structure.Item_Url[element_ID]);
+
+                                WebData_Structure.json[element_ID] = JObject.Parse(WebData_Structure.downloadString[element_ID]);
+                                WebData_Structure.lowestPrice[element_ID] = (float)(decimal.Parse(WebData_Structure.json[element_ID]["lowest_price"].ToString().Replace("€", ""), System.Globalization.NumberStyles.Currency)) / 100;
+
+                                if (WebData_Structure.mediumPrice[element_ID] == -1)
+                                {
+                                    try
+                                    {
+                                        WebData_Structure.mediumPrice[element_ID] = (float)(decimal.Parse(WebData_Structure.json[element_ID]["median_price"].ToString().Replace("€", ""), System.Globalization.NumberStyles.Currency)) / 100;
+                                    }
+                                    catch
+                                    {
+                                        WebData_Structure.mediumPrice[element_ID] = 5;
+                                    }
+                                }
+                                else if ((WebData_Structure.lowestPrice[element_ID] < (WebData_Structure.mediumPrice[element_ID]) / 2 && WebData_Structure.lowestPrice[element_ID] < 20) || (WebData_Structure.mediumPrice[element_ID] == -1 && WebData_Structure.lowestPrice[element_ID] <= 5))
+                                {
+                                    Process.Start(@"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", WebData_Structure.Item_Url[element_ID]);
+                                }
+                                //Console.WriteLine("Lowest price for " + WebData_Structure.URL_List[element_ID] + " = " + WebData_Structure.lowestPrice[element_ID]);
+                                // PushDataToQueue(WebData_Structure.name[element_ID] + " @ " + WebData_Structure.lowestPrice[element_ID]);
+                                PushDataToQueue("update@" + element_ID + "@" + WebData_Structure.lowestPrice[element_ID] + "@" + WebData_Structure.mediumPrice[element_ID]);
+                                //PushDataToQueue("update@3@21.1");
                             }
-                            Console.WriteLine("Lowest price for " + WebData_Structure.URL_List[element_ID] + " = " + WebData_Structure.lowestPrice[element_ID]);
-                            // PushDataToQueue(WebData_Structure.name[element_ID] + " @ " + WebData_Structure.lowestPrice[element_ID]);
-                            PushDataToQueue("update@" + element_ID + "@" + WebData_Structure.lowestPrice[element_ID] + "@" + WebData_Structure.mediumPrice[element_ID]);
-                            //PushDataToQueue("update@3@21.1");
+                            else
+                            {
+                                // timed out
+                                IP_Proxy.RemoveProxy(wp);
+                            }
+                            endOfCodeLabel:
+                            {
+
+                            }
+
                         }
-                        else
+                        /*catch(WebException e)
                         {
-                            // timed out
-                            if (IP_Proxy.proxyList.Contains(wp))
+                            Console.WriteLine("WebException occured in [Start_Web_Th]:: " + e.Message);
+                        }*/
+                        catch (WebException wex)
+                        {
+                            HttpWebResponse response = wex.Response as HttpWebResponse;
+                            HttpStatusCode errorCode = response.StatusCode;
+                            if (errorCode == HttpStatusCode.BadGateway || errorCode == HttpStatusCode.ProxyAuthenticationRequired || errorCode == HttpStatusCode.BadRequest)
                             {
                                 IP_Proxy.RemoveProxy(wp);
                             }
                         }
-                        endOfCodeLabel:
+                        catch (Exception e)
                         {
-
+                            Console.WriteLine("Exception occured in [Start_Web_Th][" + element_ID + "]:: " + e);
                         }
-
+                        Thread.Sleep(300);
                     }
-                    /*catch(WebException e)
-                    {
-                        Console.WriteLine("WebException occured in [Start_Web_Th]:: " + e.Message);
-                    }*/
-                    catch (WebException wex)
-                    {
-                        HttpWebResponse response = wex.Response as HttpWebResponse;
-                        HttpStatusCode errorCode = response.StatusCode;
-                        if (errorCode == HttpStatusCode.BadGateway || errorCode == HttpStatusCode.ProxyAuthenticationRequired || errorCode == HttpStatusCode.BadRequest)
-                        {
-                            IP_Proxy.RemoveProxy(wp);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Exception occured in [Start_Web_Th][" + element_ID + "]:: " + e);
-                    }
-                    Thread.Sleep(300);
                 }
                 Thread.Sleep(1000);
             }
